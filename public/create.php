@@ -15,22 +15,29 @@ if (isset($_POST['submit']))
 	{
 		$connection = new PDO($dsn, $username, $password, $options);
 		
-		$new_user = array(
-			"firstname" => $_POST['firstname'],
-			"lastname"  => $_POST['lastname'],
+		$new_user_name = array(
+			"first_name" => $_POST['firstname'],
+			"last_name"  => $_POST['lastname'],
+		);
+		
+		//first add names to name table and get the id number out
+		$sql = sprintf("INSERT INTO %s (%s) values (%s);", "names", implode(", ", array_keys($new_user_name)),":" . implode(", :", array_keys($new_user_name)));
+		$sql .= "SELECT LAST_INSERT_ID() INTO @name_id;";
+		
+		$statement = $connection->prepare($sql);
+		$last_insert_id = $statement->execute($new_user_name);
+		//build array for next insert
+		$new_user_info = array(
+			"name_id"	=> $last_insert_id,
 			"email"     => $_POST['email'],
 			"age"       => $_POST['age'],
 			"location"  => $_POST['location']
 		);
-		$sql = sprintf(
-				"INSERT INTO %s (%s) values (%s)",
-				"users",
-				implode(", ", array_keys($new_user)),
-				":" . implode(", :", array_keys($new_user))
-		);
 		
+		$sql = sprintf("INSERT INTO %s (%s) values (%s);", "users", implode(", ", array_keys($new_user_info)),":" . implode(", :", array_keys($new_user_info)));
+				
 		$statement = $connection->prepare($sql);
-		$statement->execute($new_user);
+		$statement->execute($new_user_info);
 	}
 	catch(PDOException $error) 
 	{
