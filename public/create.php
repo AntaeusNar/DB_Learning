@@ -4,11 +4,13 @@
  * users table.
  *
  */
+ 
+
 if (isset($_POST['submit']))
 {
 	
 	require "../config.php";
-	//require "../common.php";
+	require "../common.php";
 	try 
 	{
 		$connection = new PDO($dsn, $username, $password, $options);
@@ -38,7 +40,16 @@ if (isset($_POST['submit']))
 }
 ?>
 
-<?php require "templates/header.php"; ?><h2>Add a user</h2>
+<?php require "templates/header.php"; ?>
+
+<?php 
+if (isset($_POST['submit']) && $statement) 
+{ ?>
+	<blockquote><?php echo $_POST['firstname']; ?> successfully added.</blockquote>
+<?php 
+} ?>
+
+<h2>Add a user</h2>
 
 <form method="post">
 	<label for="firstname">First Name</label>
